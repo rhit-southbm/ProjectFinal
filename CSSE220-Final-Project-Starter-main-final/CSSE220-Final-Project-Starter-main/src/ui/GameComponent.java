@@ -1,60 +1,39 @@
 package ui;
 
+import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.event.ActionEvent;
-import javax.swing.JComponent;
-
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import javax.swing.JPanel;
 import model.GameModel;
 
-public class GameComponent extends JComponent {
-
+public class GameComponent extends JPanel {
     private GameModel model;
 
     public GameComponent(GameModel model) {
         this.model = model;
-        
+        this.setPreferredSize(new Dimension(600, 600)); // Fixes the shrinking issue
         this.setFocusable(true);
 
-        this.addKeyListener(new java.awt.event.KeyAdapter() {
+        this.addKeyListener(new KeyAdapter() {
             @Override
-            public void keyPressed(java.awt.event.KeyEvent e) {
-                char key = Character.toUpperCase(e.getKeyChar());
-
-                // Key Press → GameComponent → GameModel
-                if (key == 'W') {
-                    model.movePlayerUp();
-                } else if (key == 'A') {
-                    model.movePlayerLeft();
-                } else if (key == 'S') {
-                    model.movePlayerDown();
-                } else if (key == 'D') {
-                    model.movePlayerRight();
-                }
-
-                // After moving, repaint the screen
+            public void keyPressed(KeyEvent e) {
+                int code = e.getKeyCode();
+                if (code == KeyEvent.VK_W) model.getPlayer().move(0, -10);
+                if (code == KeyEvent.VK_S) model.getPlayer().move(0, 10);
+                if (code == KeyEvent.VK_A) model.getPlayer().move(-10, 0);
+                if (code == KeyEvent.VK_D) model.getPlayer().move(10, 0);
                 repaint();
             }
         });
     }
 
-
-
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
         Graphics2D g2 = (Graphics2D) g;
-
-        g2.drawString("Final Project Starter: UI is running ✅", 20, 30);
-
-        // Draw the player
-        if (model.getPlayer() != null) {
-            model.getPlayer().drawOn(g2);
-        }
-
-        // TODO: Draw Walls
-        // TODO: Draw Gems
-        // TODO: Draw Zombies
-        // TODO: Draw Score/Lives overlay
+        model.getEnemy().draw(g2);
+        model.getPlayer().draw(g2);
     }
 }

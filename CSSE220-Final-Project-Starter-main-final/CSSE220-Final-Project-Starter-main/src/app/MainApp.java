@@ -1,28 +1,22 @@
 package app;
 
 import javax.swing.SwingUtilities;
-
 import ui.GameWindow;
-import model.GameModel;
 
 /**
  * MainApp starts the program
- * @author Put your team name here
  */
 public class MainApp {
 	
 	public static void main(String[] args) {
 		SwingUtilities.invokeLater(() -> {
-		new MainApp().run();
+			new MainApp().run();
 		});
-		}
-	
-	// This runs only once at startup:
-	// MainApp creates and connects objects (no game logic here)
-	public void run() {
-		GameModel model = new GameModel();
-		GameWindow window = new GameWindow(model);
-		window.show();
 	}
-	//change
+	
+	public void run() {
+		// Just call the static show method. 
+		// It handles the Model and Window creation internally.
+		GameWindow.show();
+	}
 }

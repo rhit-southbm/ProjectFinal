@@ -5,9 +5,11 @@ public class GameModel {
     private Player player = new Player(300, 300);
 
     public void update() {
-        enemy.update(); // Only enemy moves automatically
+        enemy.update(); 
     }
 
-    public Ball getEnemy() { return enemy; }
-    public Player getPlayer() { return player; }
+    public Ball getEnemy() { 
+    	return enemy; }
+    public Player getPlayer() { 
+    	return player; }
 }

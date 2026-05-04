@@ -2,21 +2,23 @@ package model;
 
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
+import java.io.IOException;
 import javax.imageio.ImageIO;
 
 public class Player {
-    private int x, y, size = 40;
+    private int x, y, size = 15;
     private BufferedImage sprite;
 
     public Player(int x, int y) {
         this.x = x;
         this.y = y;
-        try {
-            this.sprite = ImageIO.read(getClass().getResourceAsStream("/ui/zombie.png"));
-        } catch (Exception e) {
-            System.out.println("Could not find zombie.png in src/ui/");
-            this.sprite = null;
-        }
+        this.size = size;
+//        try {
+//			sprite = ImageIO.read(Player.class.getResource("zombie.png"));
+//		} catch (IOException e) {
+//			sprite = null;
+//		}
+
     }
 
     public void move(int dx, int dy) {

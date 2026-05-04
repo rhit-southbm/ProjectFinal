@@ -3,22 +3,25 @@ package model;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
+import java.io.IOException;
+
 import javax.imageio.ImageIO;
 
 public class Ball {
     private int x, y, radius = 15;
-    private int dx = 3, dy = 2; // Auto-movement speed
+    private int dx = 3;
+    private int dy = 2;
     private BufferedImage sprite;
 
     public Ball(int x, int y) {
         this.x = x;
         this.y = y;
-        try {
-            this.sprite = ImageIO.read(getClass().getResourceAsStream("/ui/tennis.png"));
-        } catch (Exception e) {
-            System.out.println("Could not find tennis.png in src/ui/");
-            this.sprite = null;
-        }
+//        try {
+//			sprite = ImageIO.read(Ball.class.getResource("tennis.png"));
+//		} catch (IOException e) {
+//			sprite = null;
+//		}
+
     }
 
     public void update() {
@@ -38,5 +41,3 @@ public class Ball {
         }
     }
 }
-
-

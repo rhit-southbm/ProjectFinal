@@ -20,7 +20,6 @@ public class GameWindow {
 
         component.requestFocusInWindow();
 
-        // The "Heartbeat" of the game
         Timer timer = new Timer(30, e -> {
             model.update();
             component.repaint();

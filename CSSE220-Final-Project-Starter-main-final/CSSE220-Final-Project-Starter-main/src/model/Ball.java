@@ -16,11 +16,11 @@ public class Ball {
     public Ball(int x, int y) {
         this.x = x;
         this.y = y;
-//        try {
-//			sprite = ImageIO.read(Ball.class.getResource("tennis.png"));
-//		} catch (IOException e) {
-//			sprite = null;
-//		}
+        try {
+			sprite = ImageIO.read(Ball.class.getResource("tennis.png"));
+		} catch (IOException e) {
+			sprite = null;
+		}
 
     }
 

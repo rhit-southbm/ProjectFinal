@@ -5,7 +5,6 @@ import javax.swing.Timer;
 import model.GameModel;
 
 public class GameWindow {
-    // This is the static method MainApp calls
     public static void show() {
         GameModel model = new GameModel();
         JFrame frame = new JFrame("CSSE220 Final Project");
@@ -20,8 +19,11 @@ public class GameWindow {
 
         component.requestFocusInWindow();
 
+        // Step 8: Conditionally update only if elements remain
         Timer timer = new Timer(30, e -> {
-            model.update();
+            if (!model.isGameOver()) {
+                model.update();
+            }
             component.repaint();
         });
         timer.start();

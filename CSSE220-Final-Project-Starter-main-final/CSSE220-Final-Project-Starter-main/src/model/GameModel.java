@@ -1,5 +1,7 @@
 package model;
 
+import java.awt.Color;
+import java.awt.Graphics2D;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Scanner;
@@ -17,9 +19,8 @@ public class GameModel {
     private int score;
     private int lives;
     private String currentFilename;
-
-    // Student-style counter instead of systemic millisecond tracking
     private int invincibilityFrames = 0;
+    private char[][] grid;
 
     /**
      * Initializes lists and kicks off level generation.
@@ -44,27 +45,64 @@ public class GameModel {
         if (stream == null) {
             throw new RuntimeException("Level file not found: " + filename);
         }
-
-        int row = 0;
+        
+        ArrayList<String> lines = new ArrayList();
         Scanner scanner = new Scanner(stream);
         while (scanner.hasNextLine()) {
-            String line = scanner.nextLine();
-            for (int col = 0; col < line.length(); col++) {
-                char ch = line.charAt(col);
-                int x = col * TILE_SIZE;
-                int y = row * TILE_SIZE;
-
-                if (ch == 'P') {
-                    this.player = new Player(x, y);
-                } else if (ch == 'B') {
-                    enemies.add(new Ball(x, y));
-                } else if (ch == 'C') {
-                    collectibles.add(new Item(x, y));
-                }
-            }
-            row++;
+        	lines.add(scanner.nextLine());
         }
         scanner.close();
+        
+        grid = new char[lines.size()][];
+        
+        for (int row = 0; row < lines.size(); row++) {
+        	String line = lines.get(row);
+        	grid[row] = line.toCharArray();
+        	
+        	for (int col = 0; col < grid[row].length; col++) {
+        		char ch = grid[row][col];
+        		int pixelsX = col*TILE_SIZE;
+        		int pixelsY = row*TILE_SIZE;
+        		
+        		if (ch == 'P') {
+        			this.player = new Player(pixelsX, pixelsY);
+        		} else if (ch == 'Z' || ch == 'B') {
+        			enemies.add(new Ball(pixelsX, pixelsY));
+        		} else if (ch == 'C' ) {
+        			collectibles.add(new Item(pixelsX, pixelsY));
+        		}
+        		}
+        	
+        				
+        	}
+        }
+    
+    public boolean isWall(int row, int col) {
+    	if (row < 0 || row >= grid.length || col < 0 || col >= grid[row].length) {
+    		return true;
+    	}
+    	return grid[row][col] == '#';
+    	}
+    
+    public int getGridWidth() {
+    	if (grid == null || grid.length == 0) return 600;
+    	return grid[0].length*TILE_SIZE;
+    }
+    
+    public int getGridHeight() {
+    	if (grid == null) return 600;
+    	return grid.length*TILE_SIZE;
+    }
+    
+    public void drawGridWalls(Graphics2D g2) {
+    	g2.setColor(Color.black);
+    	for (int row = 0; row < grid.length; row++) {
+    		for (int col = 0; col < grid[row].length; col++) {
+    			if (grid[row][col] == '*' || grid[row][col] == '#') {
+    				g2.fillRect(col*TILE_SIZE, row*TILE_SIZE, TILE_SIZE, TILE_SIZE);
+    			}
+    		}
+    	}
     }
 
     /**
@@ -133,7 +171,18 @@ public class GameModel {
      */
     public void movePlayer(int dx, int dy) {
         if (isGameOver()) return;
-        if (player != null) player.move(dx, dy);
+        if (player != null) {
+        	int currentLeftCol = player.getX() /TILE_SIZE;
+        	int currentTopRow = player.getY() /TILE_SIZE;
+        	
+        	int targetCol = currentLeftCol + dx;
+        	int targetRow = currentTopRow + dy;
+        	
+        	if (!isWall(targetRow, targetCol)) {
+        		player.move(dx*TILE_SIZE, dy*TILE_SIZE);
+    }
+        	
+        }
     }
 
     public int getScore() { return score; }

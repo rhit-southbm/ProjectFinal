@@ -42,6 +42,7 @@ public class GameComponent extends JPanel {
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
         Graphics2D g2 = (Graphics2D) g;
+        model.drawGridWalls(g2);
         
         if (model.getPlayer() != null) model.getPlayer().draw(g2);
         for (Ball b : model.getEnemies()) b.draw(g2);

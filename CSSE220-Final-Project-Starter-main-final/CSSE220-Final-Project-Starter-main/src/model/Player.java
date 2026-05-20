@@ -20,14 +20,20 @@ public class Player implements Collidable {
             sprite = null;
         }
     }
+    
+
 
     public void move(int dx, int dy) {
         x += dx;
         y += dy;
-        if (x < 0) x = 0;
-        if (x > 600 - size) x = 600 - size;
-        if (y < 0) y = 0;
-        if (y > 600 - size) y = 600 - size;
+    }
+    
+    public int getX() {
+    	return x;
+    }
+    
+    public int getY() {
+    	return y;
     }
 
     @Override

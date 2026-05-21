@@ -1,5 +1,6 @@
 package ui;
 
+import java.awt.Dimension;
 import javax.swing.JFrame;
 import javax.swing.Timer;
 import model.GameModel;
@@ -10,16 +11,21 @@ public class GameWindow {
         JFrame frame = new JFrame("CSSE220 Final Project");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        GameComponent component = new GameComponent(model);
-        frame.add(component);
         
+        GameComponent component = new GameComponent(model);
+        component.setPreferredSize(new Dimension(model.getGridWidth(), model.getGridHeight())); // Restores form-fitting size
+        frame.add(component);
+        frame.pack();
+
+        
+        
+        frame.add(component);
         frame.pack(); 
         frame.setLocationRelativeTo(null);
         frame.setVisible(true);
 
         component.requestFocusInWindow();
 
-        // Step 8: Conditionally update only if elements remain
         Timer timer = new Timer(30, e -> {
             if (!model.isGameOver()) {
                 model.update();
@@ -27,6 +33,8 @@ public class GameWindow {
             component.repaint();
         });
         timer.start();
+        
+        
     }
 }
 

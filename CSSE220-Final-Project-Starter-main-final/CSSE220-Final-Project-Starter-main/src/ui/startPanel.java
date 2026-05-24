@@ -13,10 +13,8 @@ public class startPanel extends JPanel {
     private JButton startButton;
     
     public startPanel() {
-        
         setBorder(BorderFactory.createEmptyBorder(50, 50, 50, 50));
         setLayout(new BorderLayout());
-        
         
         JLabel title = new JLabel("CSSE220 Zombie Maze Game");
         title.setFont(new Font("Arial", Font.BOLD, 24));

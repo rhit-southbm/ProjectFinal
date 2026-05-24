@@ -8,33 +8,27 @@ import java.io.IOException;
 import javax.imageio.ImageIO;
 
 public class Player implements Collidable {
-    private int x, y, size = 15;
+    private int x, y;
+    private final int size = 25;
     private BufferedImage sprite;
 
     public Player(int x, int y) {
         this.x = x;
         this.y = y;
         try {
-            sprite = ImageIO.read(Player.class.getResource("zombie.png"));
+            sprite = ImageIO.read(Player.class.getResource("ball.png"));
         } catch (IOException e) {
             sprite = null;
         }
     }
-    
-
 
     public void move(int dx, int dy) {
         x += dx;
         y += dy;
     }
     
-    public int getX() {
-    	return x;
-    }
-    
-    public int getY() {
-    	return y;
-    }
+    public int getX() { return x; }
+    public int getY() { return y; }
 
     @Override
     public Rectangle getBounds() {
@@ -48,8 +42,6 @@ public class Player implements Collidable {
             g2.setColor(Color.GREEN);
             g2.fillRect(x, y, size, size);
         }
-        g2.setColor(Color.RED);
-        g2.draw(getBounds());
     }
 }
 

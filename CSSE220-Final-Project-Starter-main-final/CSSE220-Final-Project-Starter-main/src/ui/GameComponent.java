@@ -17,7 +17,7 @@ public class GameComponent extends JPanel {
 
     public GameComponent(GameModel model) {
         this.model = model;
-        this.setPreferredSize(new Dimension(model.getGridWidth(), model.getGridHeight()));
+        this.setPreferredSize(new Dimension(model.getGridWidth(), model.getGridHeight() + 60));
         this.setFocusable(true);
 
         this.addKeyListener(new KeyAdapter() {
@@ -25,10 +25,11 @@ public class GameComponent extends JPanel {
             public void keyPressed(KeyEvent e) {
                 int code = e.getKeyCode();
                 
-                if (code == KeyEvent.VK_W) model.movePlayer(0, -1);
-                if (code == KeyEvent.VK_S) model.movePlayer(0, 1);
-                if (code == KeyEvent.VK_A) model.movePlayer(-1, 0);
-                if (code == KeyEvent.VK_D) model.movePlayer(1, 0);
+               
+                if (code == KeyEvent.VK_W || code == KeyEvent.VK_UP)    model.movePlayer(0, -1);
+                if (code == KeyEvent.VK_S || code == KeyEvent.VK_DOWN)  model.movePlayer(0, 1);
+                if (code == KeyEvent.VK_A || code == KeyEvent.VK_LEFT)  model.movePlayer(-1, 0);
+                if (code == KeyEvent.VK_D || code == KeyEvent.VK_RIGHT) model.movePlayer(1, 0);
                 
                 if (code == KeyEvent.VK_R) {
                     model.restartGame();
@@ -43,6 +44,7 @@ public class GameComponent extends JPanel {
         super.paintComponent(g);
         Graphics2D g2 = (Graphics2D) g;
         
+        
         model.drawGridWalls(g2);
         
         if (model.getPlayer() != null) model.getPlayer().draw(g2);
@@ -51,29 +53,52 @@ public class GameComponent extends JPanel {
             item.draw(g2);
         }
         
-        g2.setColor(Color.BLACK);
-        g2.setFont(new Font("Arial", Font.BOLD, 16));
-        g2.drawString("Score: " + model.getScore(), 30, 40);
-        g2.drawString("Lives Remaining: " + model.getLives(), 30, 60);
-        g2.drawString("Current Level: " + model.getLevelNumber(), 30, 80);
+       
+        int hudY = model.getGridHeight(); 
+
+        g2.setColor(Color.DARK_GRAY);
+        g2.fillRect(0, hudY, getWidth(), 60);
+
+        g2.setColor(Color.LIGHT_GRAY);
+        g2.drawLine(0, hudY, getWidth(), hudY);
+
+        g2.setColor(Color.WHITE);
+        g2.setFont(new Font("Arial", Font.BOLD, 14));
+
+       
+        g2.drawString("Score: " + model.getScore(), 20, hudY + 35);
+        g2.drawString("Lives: " + model.getLives(), 120, hudY + 35);
+        g2.drawString("Level: " + model.getLevelNumber(), 220, hudY + 35);
+        g2.drawString("Key Secured: " + (model.hasKey() ? "YES" : "NO"), 320, hudY + 35);
+        
         
         if (model.isGameOver()) {
+            g2.setColor(new Color(0, 0, 0, 200));
+            g2.fillRect(0, 0, getWidth(), getHeight());
+            
             g2.setColor(Color.RED);
             g2.setFont(new Font("Arial", Font.BOLD, 36));
             g2.drawString("GAME OVER!!!!!", getWidth() / 2 - 130, getHeight() / 2 - 20);
             g2.setFont(new Font("Arial", Font.PLAIN, 18));
+            g2.setColor(Color.WHITE);
             g2.drawString("Press 'R' to Restart the Game", getWidth() / 2 - 120, getHeight() / 2 + 20);
         }
         
+        
         if (model.isGameWon()) {
+            g2.setColor(new Color(0, 0, 0, 200));
+            g2.fillRect(0, 0, getWidth(), getHeight());
+            
             g2.setColor(new Color(0, 153, 76)); 
             g2.setFont(new Font("Arial", Font.BOLD, 36));
-            g2.drawString("YOU WIN!!!!! 🚀", getWidth() / 2 - 120, getHeight() / 2 - 20);
+            g2.drawString("YOU WIN!!!!!", getWidth() / 2 - 120, getHeight() / 2 - 20);
             g2.setFont(new Font("Arial", Font.PLAIN, 18));
+            g2.setColor(Color.WHITE);
             g2.drawString("Amazing job! Press 'R' to play again.", getWidth() / 2 - 150, getHeight() / 2 + 20);
         }
     }
 }
+
 
 
 

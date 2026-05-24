@@ -21,7 +21,7 @@ public class Ball implements Collidable {
         this.x = x;
         this.y = y;
         try {
-            sprite = ImageIO.read(Ball.class.getResource("tennis.png"));
+            sprite = ImageIO.read(Ball.class.getResource("zombie.png"));
         } catch (IOException e) {
             sprite = null;
         }
@@ -41,7 +41,6 @@ public class Ball implements Collidable {
         if (dir == 2) targetCol--;
         if (dir == 3) targetCol++;
 
-        // Ensure the target tile inside the maze layout isn't a wall block
         if (!model.isWall(targetRow, targetCol)) {
             x = targetCol * GameModel.TILE_SIZE;
             y = targetRow * GameModel.TILE_SIZE;
@@ -62,9 +61,8 @@ public class Ball implements Collidable {
             g2.setColor(Color.RED);
             g2.fillOval(x, y, size, size);
         }
-        g2.setColor(Color.RED);
-        g2.draw(getBounds());
     }
 }
+
 
 

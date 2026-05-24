@@ -1,7 +1,9 @@
 package ui;
 
+import java.awt.CardLayout;
 import java.awt.Dimension;
 import javax.swing.JFrame;
+import javax.swing.JPanel;
 import javax.swing.Timer;
 import model.GameModel;
 
@@ -11,30 +13,45 @@ public class GameWindow {
         JFrame frame = new JFrame("CSSE220 Final Project");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        
-        GameComponent component = new GameComponent(model);
-        component.setPreferredSize(new Dimension(model.getGridWidth(), model.getGridHeight())); // Restores form-fitting size
-        frame.add(component);
-        frame.pack();
+   
+        CardLayout cl = new CardLayout();
+        JPanel cards = new JPanel(cl);
 
+        startPanel startScreen = new startPanel();
+        GameComponent component = new GameComponent(model);
+        component.setPreferredSize(new Dimension(model.getGridWidth(), model.getGridHeight())); 
+
+     
+        cards.add(startScreen, "START");
+        cards.add(component, "GAME");
         
-        
-        frame.add(component);
+        frame.setContentPane(cards);
         frame.pack(); 
         frame.setLocationRelativeTo(null);
         frame.setVisible(true);
 
-        component.requestFocusInWindow();
+        
+        cl.show(cards, "START");
 
+        
         Timer timer = new Timer(30, e -> {
             if (!model.isGameOver()) {
                 model.update();
             }
             component.repaint();
         });
-        timer.start();
-        
-        
+
+       
+        startScreen.getStartButton().addActionListener(e -> {
+            cl.show(cards, "GAME");
+            
+            component.setPreferredSize(new Dimension(model.getGridWidth(), model.getGridHeight() + 60));
+            frame.pack(); 
+            frame.setLocationRelativeTo(null);
+            
+            component.requestFocusInWindow();
+            timer.start();
+        });
     }
 }
 

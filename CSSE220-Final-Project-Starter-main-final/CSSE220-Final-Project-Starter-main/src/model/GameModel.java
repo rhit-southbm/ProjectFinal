@@ -1,14 +1,13 @@
 package model;
 
-import java.awt.Graphics2D;
 import java.awt.Color;
+import java.awt.Graphics2D;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Scanner;
+import java.awt.image.BufferedImage;
+import javax.imageio.ImageIO;
 
-/**
- * GameModel manages the game state, layout loading, and entity updates.
- */
 public class GameModel {
     public static final int TILE_SIZE = 40;
     
@@ -24,22 +23,31 @@ public class GameModel {
 
     private int levelNumber = 1;
     private boolean gameWon = false;
+    private boolean hasKey = false;
+
+    private BufferedImage wallSprite;
+    private BufferedImage bgSprite;
 
     public GameModel() {
         this.enemies = new ArrayList<>();
         this.collectibles = new ArrayList<>();
         this.score = 0;
         this.lives = 3;
+        
+        try {
+            this.wallSprite = ImageIO.read(GameModel.class.getResource("wall.png"));
+            this.bgSprite = ImageIO.read(GameModel.class.getResource("bg.png"));
+        } catch (Exception e) {
+        }
+        
         loadLevel("level1.txt");
     }
 
-    /**
-     * Parses level configurations into a real 2D grid array.
-     */
     public void loadLevel(String filename) {
         this.currentFilename = filename;
         this.enemies.clear();
         this.collectibles.clear();
+        this.hasKey = false;
         
         InputStream stream = GameModel.class.getResourceAsStream(filename);
         if (stream == null) {
@@ -61,7 +69,6 @@ public class GameModel {
 
             for (int col = 0; col < grid[row].length; col++) {
                 char ch = grid[row][col];
-                
                 int pixelX = col * TILE_SIZE;
                 int pixelY = row * TILE_SIZE;
 
@@ -80,7 +87,10 @@ public class GameModel {
         if (row < 0 || row >= grid.length || col < 0 || col >= grid[row].length) {
             return true;
         }
-        return grid[row][col] == '#' || grid[row][col] == '*';
+        char tile = grid[row][col];
+        if (tile == '#' || tile == '*') return true;
+        if (tile == 'D' && !hasKey) return true;
+        return false;
     }
 
     public int getGridWidth() {
@@ -93,20 +103,39 @@ public class GameModel {
         return grid.length * TILE_SIZE;
     }
     
-    /**
-     * Draws static environment tiles (Walls and the Exit door).
-     */
     public void drawGridWalls(Graphics2D g2) {
+        int ts = TILE_SIZE;
+        
+        if (bgSprite != null) {
+            for (int row = 0; row < grid.length; row++) {
+                for (int col = 0; col < grid[row].length; col++) {
+                    g2.drawImage(bgSprite, col * ts, row * ts, ts, ts, null);
+                }
+            }
+        } else {
+            g2.setColor(Color.BLACK);
+            g2.fillRect(0, 0, getGridWidth(), getGridHeight());
+        }
+
         for (int row = 0; row < grid.length; row++) {
             for (int col = 0; col < grid[row].length; col++) {
-                if (grid[row][col] == '*' || grid[row][col] == '#') {
-                    g2.setColor(Color.DARK_GRAY);
-                    g2.fillRect(col * TILE_SIZE, row * TILE_SIZE, TILE_SIZE, TILE_SIZE);
-                    g2.setColor(Color.LIGHT_GRAY);
-                    g2.drawRect(col * TILE_SIZE, row * TILE_SIZE, TILE_SIZE, TILE_SIZE);
-                } else if (grid[row][col] == 'E') {
-                    g2.setColor(Color.BLUE);
-                    g2.fillRect(col * TILE_SIZE, row * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+                char tile = grid[row][col];
+                int x = col * ts;
+                int y = row * ts;
+
+                if (tile == '*' || tile == '#') {
+                    if (wallSprite != null) {
+                        g2.drawImage(wallSprite, x, y, ts, ts, null);
+                    } else {
+                        g2.setColor(Color.DARK_GRAY);
+                        g2.fillRect(x, y, ts, ts);
+                    }
+                } else if (tile == 'E') {
+                    g2.setColor(Color.BLUE); 
+                    g2.fillRect(x, y, ts, ts);
+                } else if (tile == 'D') {
+                    g2.setColor(new Color(102, 51, 0)); 
+                    g2.fillRect(x, y, ts, ts);
                 }
             }
         }
@@ -132,7 +161,6 @@ public class GameModel {
             b.update(this);
         }
 
-        // Collectibles processing
         for (int i = collectibles.size() - 1; i >= 0; i--) {
             if (player.getBounds().intersects(collectibles.get(i).getBounds())) {
                 collectibles.remove(i);
@@ -140,7 +168,6 @@ public class GameModel {
             }
         }
 
-        // Enemy-player collisions
         for (Ball b : enemies) {
             if (player.getBounds().intersects(b.getBounds())) {
                 if (invincibilityFrames == 0) {
@@ -150,12 +177,21 @@ public class GameModel {
             }
         }
 
-        // Precise level progression check based on player visual center
         int playerCol = (player.getX() + TILE_SIZE / 2) / TILE_SIZE;
         int playerRow = (player.getY() + TILE_SIZE / 2) / TILE_SIZE;
         
         if (playerRow >= 0 && playerRow < grid.length && playerCol >= 0 && playerCol < grid[playerRow].length) {
-            if (grid[playerRow][playerCol] == 'E' && collectibles.isEmpty()) {
+            char currentTile = grid[playerRow][playerCol];
+            
+            if (currentTile == 'K') {
+                hasKey = true;
+                grid[playerRow][playerCol] = '.'; 
+            }
+            if (currentTile == 'D' && hasKey) {
+                grid[playerRow][playerCol] = '.'; 
+            }
+
+            if (currentTile == 'E' && collectibles.isEmpty()) {
                 if (levelNumber == 1) {
                     levelNumber = 2;
                     loadLevel("level2.txt");
@@ -166,10 +202,6 @@ public class GameModel {
             }
         }
     }
-
-    public boolean isGameOver() { return lives <= 0; }
-    public boolean isGameWon() { return gameWon; }
-    public int getLevelNumber() { return levelNumber; }
 
     public void movePlayer(int dx, int dy) {
         if (isGameOver() || isGameWon()) return;
@@ -186,12 +218,17 @@ public class GameModel {
         }
     }
 
+    public boolean isGameOver() { return lives <= 0; }
+    public boolean isGameWon() { return gameWon; }
+    public int getLevelNumber() { return levelNumber; }
     public int getScore() { return score; }
     public int getLives() { return lives; }
+    public boolean hasKey() { return hasKey; }
     public ArrayList<Ball> getEnemies() { return enemies; }
     public ArrayList<Item> getCollectibles() { return collectibles; }
     public Player getPlayer() { return player; }
 }
+
 
 
 
